@@ -29,5 +29,6 @@
 #define SHOT_SIZE       5
 
 #include "Class/player.h"
+#include "Class/meteors.h"
 
 #endif //INCLUDED_MAIN_HEADERS_H
