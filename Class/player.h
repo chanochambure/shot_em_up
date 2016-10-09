@@ -103,20 +103,51 @@ class Player
             glBegin(GL_QUADS);
             for(std::list<Weapon_Shot>::iterator iter=shots.begin();iter!=shots.end();++iter)
             {
-                glVertex3f(((*iter).second).first[0]+((*iter).first*cos(((*iter).second).second))-SHOT_SIZE/2,
-                            ((*iter).second).first[1]+((*iter).first*sin(((*iter).second).second))-SHOT_SIZE/2,
-                            0.0);
-                glVertex3f(((*iter).second).first[0]+((*iter).first*cos(((*iter).second).second))-SHOT_SIZE/2,
-                            ((*iter).second).first[1]+((*iter).first*sin(((*iter).second).second)+SHOT_SIZE/2),
-                            0.0);
-                glVertex3f(((*iter).second).first[0]+((*iter).first*cos(((*iter).second).second))+SHOT_SIZE/2,
-                            ((*iter).second).first[1]+((*iter).first*sin(((*iter).second).second))+SHOT_SIZE/2,
-                            0.0);
-                glVertex3f(((*iter).second).first[0]+((*iter).first*cos(((*iter).second).second))+SHOT_SIZE/2,
-                            ((*iter).second).first[1]+((*iter).first*sin(((*iter).second).second))-SHOT_SIZE/2,
-                            0.0);
+                float pos_x=((*iter).second).first[0]+((*iter).first*cos(((*iter).second).second));
+                float pos_y=((*iter).second).first[1]+((*iter).first*sin(((*iter).second).second));
+                glVertex3f(pos_x-SHOT_SIZE/2,
+                           pos_y-SHOT_SIZE/2,
+                           0.0);
+                glVertex3f(pos_x-SHOT_SIZE/2,
+                           pos_y+SHOT_SIZE/2,
+                           0.0);
+                glVertex3f(pos_x+SHOT_SIZE/2,
+                           pos_y+SHOT_SIZE/2,
+                           0.0);
+                glVertex3f(pos_x+SHOT_SIZE/2,
+                           pos_y-SHOT_SIZE/2,
+                           0.0);
             }
             glEnd();
+        }
+        void clear()
+        {
+            _V_timer.clear();
+            shots.clear();
+        }
+
+        int meteor_collision(meteor meteoro)
+        {
+            for(std::list<Weapon_Shot>::iterator iter=shots.begin();iter!=shots.end();++iter)
+            {
+                float pos_x=((*iter).second).first[0]+((*iter).first*cos(((*iter).second).second));
+                float pos_y=((*iter).second).first[1]+((*iter).first*sin(((*iter).second).second));
+                if(LL::segment_collision(meteoro.getPosX()-meteoro.get_size()/2,meteoro.getPosX()+meteoro.get_size()/2,
+                                         pos_x-SHOT_SIZE/2,pos_x+SHOT_SIZE/2))
+                {
+                    if(LL::segment_collision(meteoro.getPosY()-meteoro.get_size()/2,meteoro.getPosY()+meteoro.get_size()/2,
+                                             pos_y-SHOT_SIZE/2,pos_y+SHOT_SIZE/2))
+                        return 1;
+                }
+            }
+            if(LL::segment_collision(meteoro.getPosX()-meteoro.get_size()/2,meteoro.getPosX()+meteoro.get_size()/2,
+                                     _V_pos_x-_V_size_x/2,_V_pos_x+_V_size_x/2))
+            {
+                if(LL::segment_collision(meteoro.getPosY()-meteoro.get_size()/2,meteoro.getPosY()+meteoro.get_size()/2,
+                                         _V_pos_y-_V_size_y/2,_V_pos_y+_V_size_y/2))
+                    return 2;
+            }
+            return 0;
         }
 };
 

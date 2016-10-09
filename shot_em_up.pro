@@ -10,7 +10,8 @@ SOURCES += main.cpp
 HEADERS +=  main_boid.h\
 			main_headers.h \
 			gamemain.h \
-			Class/player.h
+			Class/player.h \
+			Class/meteors.h
 
 LIBS +=	-lGL\
 		-lGLU\

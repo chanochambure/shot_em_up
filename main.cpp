@@ -4,6 +4,7 @@ int main()
 {
 	LL_AL5::init_allegro();
 	LL_AL5::image_addon();
+    LL_AL5::text_addon();
 	LL_AL5::Display display(SIZE_X,SIZE_Y);
     display.set_flag(ALLEGRO_OPENGL);
 

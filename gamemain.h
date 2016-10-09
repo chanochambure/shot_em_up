@@ -16,6 +16,25 @@ void openGL_configuration()
 
 void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
 {
+    LL_AL5::Font font;
+    font.set_path("comic.ttf");
+    font.set_size(24);
+    font.load_ttf_font();
+
+    LL_AL5::Text text;
+    text.set_color(LL_AL5::Color(255,255,255));
+    text.set_pos(50,50);
+    text.set_font(&font);
+    text="Score";
+
+    LL_AL5::Text text_score;
+    text_score.set_color(LL_AL5::Color(255,255,255));
+    text_score.set_pos(60,70);
+    text_score.set_font(&font);
+    text_score.set_flag(ALLEGRO_ALIGN_CENTER);
+    text_score="0";
+
+    int score=0;
 
     LL_AL5::KeyControl key_control;
     key_control.add_key(MOVE_UP,ALLEGRO_KEY_W);
@@ -30,6 +49,7 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
     openGL_configuration();
     Player player;
     player.set_pos(INITIAL_X,INITIAL_Y);
+    meteorsEngine engine;
     while(!input->get_display_status())
     {
         //Delta Time
@@ -41,6 +61,17 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
         player.set_left((*input)[MOVE_LEFT]);
         player.set_right((*input)[MOVE_RIGHT]);
         player.move(dt);
+        engine.move(dt);
+        int to_upgrade=engine.meteor_collision(&player);
+        if(to_upgrade==-1)
+        {
+            player.clear();
+            player.set_pos(INITIAL_X,INITIAL_Y);
+            engine.clear();
+            score=0;
+        }
+        else
+            score+=to_upgrade;
         if(input->get_event())
         {
             if(input->left_click())
@@ -49,8 +80,12 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
             }
             if(input->get_timer_event())
             {
+                text_score=LL::to_string(score);
                 display->clear_to_color(LL_AL5::Color());
                 player.draw();
+                engine.draw();
+                display->draw(&text);
+                display->draw(&text_score);
                 display->refresh();
             }
         }
