@@ -50,6 +50,11 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
     Player player;
     player.set_pos(INITIAL_X,INITIAL_Y);
     meteorsEngine engine;
+    LL_AL5::Audio stage;
+    stage.set_path("stage.ogg");
+    stage.load();
+    stage.set_playmode(ALLEGRO_PLAYMODE_LOOP);
+    stage.play();
     while(!input->get_display_status())
     {
         //Delta Time
@@ -74,10 +79,6 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
             score+=to_upgrade;
         if(input->get_event())
         {
-            if(input->left_click())
-            {
-                player.shot(input->get_mouse_x(),input->get_mouse_y());
-            }
             if(input->get_timer_event())
             {
                 text_score=LL::to_string(score);
@@ -90,6 +91,7 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
             }
         }
     }
+    stage.stop();
 }
 
 #endif // INCLUDED_GAMEMAIN_H

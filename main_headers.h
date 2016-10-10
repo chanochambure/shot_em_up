@@ -10,6 +10,7 @@
 #include "LexRisLogic/Convert.h"
 #include "LexRisLogic/Time.h"
 #include <allegro5/allegro_opengl.h>
+#include <GL/glu.h>
 
 #define SIZE_X          400
 #define SIZE_Y          700

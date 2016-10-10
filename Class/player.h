@@ -6,6 +6,8 @@
 class Player
 {
     private:
+        LL_AL5::Image _V_sprite_player;
+        GLuint _V_texture_player=0;
         GLfloat _V_max_speed=300.0;
         GLfloat _V_pos_x=0.0;
         GLfloat _V_pos_y=0.0;
@@ -27,6 +29,9 @@ class Player
         {
             _V_timer.play();
             _V_time_to_shot=TIME_TO_SHOT;
+            _V_sprite_player.set_path("nave.png");
+            _V_sprite_player.load();
+            _V_texture_player = al_get_opengl_texture(_V_sprite_player);
         }
         void set_pos(GLfloat new_x,GLfloat new_y)
         {
@@ -73,33 +78,43 @@ class Player
                 else
                     iter=shots.erase(iter);
             }
+            shot();
         }
-        void shot(int shot_x,int shot_y)
+        void shot()
         {
             if(_V_timer.get_time()>_V_time_to_shot)
             {
-                int x=shot_x-_V_pos_x;
-                int y=shot_y-_V_pos_y;
-                float angle=0;
-                if(x or y)
-                {
-                    angle=acos(x/sqrt(pow(x,2)+pow(y,2)));
-                    if(y<0)
-                        angle*=-1;
-                }
+                float angle=LL::sexagesimal_to_radian(-90);
                 shots.push_back(Weapon_Shot(0,Direction_Shot(LL_MathStructure::create_point(_V_pos_x,_V_pos_y),angle)));
                 _V_timer.clear();
             }
         }
         void draw()
         {
-            glColor3d(255,255,255);
-            glBegin(GL_TRIANGLES);
-                glVertex3f(_V_pos_x,_V_pos_y-_V_size_y/2,0.0);
-                glVertex3f(_V_pos_x-_V_size_x/2,_V_pos_y+_V_size_y/2,0.0);
+            glColor3d(128,128,128);
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, _V_texture_player);
+
+            glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+            glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_REPEAT);
+            glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_REPEAT);
+            glBegin(GL_QUADS);
+                glTexCoord2f(1, 1);
+                glVertex3f(_V_pos_x-_V_size_x/2,_V_pos_y-_V_size_y/2,0.0);
+
+                glTexCoord2f(0,1);
+                glVertex3f(_V_pos_x+_V_size_x/2,_V_pos_y-_V_size_y/2,0.0);
+
+                glTexCoord2f(0, 0);
                 glVertex3f(_V_pos_x+_V_size_x/2,_V_pos_y+_V_size_y/2,0.0);
+
+                glTexCoord2f(1, 0);
+                glVertex3f(_V_pos_x-_V_size_x/2,_V_pos_y+_V_size_y/2,0.0);
+            glEnd();
+            glDisable(GL_TEXTURE_2D);
+
             glColor3d(255,0,0);
-            glEnd();;
             glBegin(GL_QUADS);
             for(std::list<Weapon_Shot>::iterator iter=shots.begin();iter!=shots.end();++iter)
             {
@@ -148,6 +163,10 @@ class Player
                     return 2;
             }
             return 0;
+        }
+        ~Player()
+        {
+            glDeleteTextures(1, &_V_texture_player);
         }
 };
 
