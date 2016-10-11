@@ -16,7 +16,7 @@
 #define MAX_METEORS_NORMAL  20
 #define MAX_METEORS_HARD    30
 #define TIME_TO_CREATE      1.5
-#define SIZE_METEORS        20
+#define SIZE_METEORS        30
 
 class meteor {
     private:

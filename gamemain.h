@@ -82,6 +82,9 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
             if(input->get_timer_event())
             {
                 text_score=LL::to_string(score);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                glMatrixMode(GL_MODELVIEW);
+                glLoadIdentity();
                 display->clear_to_color(LL_AL5::Color());
                 player.draw();
                 engine.draw();

@@ -160,15 +160,18 @@ class Player
                 if(LL::segment_collision(meteoro.getPosX()-meteoro.get_size()/2,meteoro.getPosX()+meteoro.get_size()/2,
                                          pos_x-SHOT_SIZE/2,pos_x+SHOT_SIZE/2))
                 {
-                    if(LL::segment_collision(meteoro.getPosY()-meteoro.get_size()/2,meteoro.getPosY()+meteoro.get_size()/2,
+                    if(LL::segment_collision(meteoro.getPosY()-meteoro.get_size()*COLLISION_TOLERANCE/2,
+                                             meteoro.getPosY()+meteoro.get_size()*COLLISION_TOLERANCE/2,
                                              pos_y-SHOT_SIZE/2,pos_y+SHOT_SIZE/2))
                         return 1;
                 }
             }
-            if(LL::segment_collision(meteoro.getPosX()-meteoro.get_size()/2,meteoro.getPosX()+meteoro.get_size()/2,
+            if(LL::segment_collision(meteoro.getPosX()-meteoro.get_size()*COLLISION_TOLERANCE/2,
+                                     meteoro.getPosX()+meteoro.get_size()*COLLISION_TOLERANCE/2,
                                      _V_pos_x-_V_size_x/2,_V_pos_x+_V_size_x/2))
             {
-                if(LL::segment_collision(meteoro.getPosY()-meteoro.get_size()/2,meteoro.getPosY()+meteoro.get_size()/2,
+                if(LL::segment_collision(meteoro.getPosY()-meteoro.get_size()*COLLISION_TOLERANCE/2,
+                                         meteoro.getPosY()+meteoro.get_size()*COLLISION_TOLERANCE/2,
                                          _V_pos_y-_V_size_y/2,_V_pos_y+_V_size_y/2))
                     return 2;
             }
