@@ -96,7 +96,6 @@ class Player
         }
         void draw()
         {
-            //glColor3d(128,128,128);
             glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, _V_texture_player);
 
@@ -132,13 +131,16 @@ class Player
                 float pos_x=((*iter).second).first[0]+((*iter).first*cos(((*iter).second).second));
                 float pos_y=((*iter).second).first[1]+((*iter).first*sin(((*iter).second).second));
                 glTexCoord2f(1, 1);
-                glVertex3f(pos_x-SHOT_SIZE/1.5, pos_y-SHOT_SIZE/1.5, 0.0);
+                glVertex3f(pos_x-SHOT_SIZE/2.0, pos_y-SHOT_SIZE/2.0, 0.0);
+
                 glTexCoord2f(0, 1);
-                glVertex3f(pos_x-SHOT_SIZE/1.5, pos_y+SHOT_SIZE/1.5, 0.0);
+                glVertex3f(pos_x-SHOT_SIZE/2.0, pos_y+SHOT_SIZE/2.0, 0.0);
+
                 glTexCoord2f(0, 0);
-                glVertex3f(pos_x+SHOT_SIZE/1.5, pos_y+SHOT_SIZE/1.5, 0.0);
+                glVertex3f(pos_x+SHOT_SIZE/2.0, pos_y+SHOT_SIZE/2.0, 0.0);
+
                 glTexCoord2f(1, 0);
-                glVertex3f(pos_x+SHOT_SIZE/1.5, pos_y-SHOT_SIZE/1.5, 0.0);
+                glVertex3f(pos_x+SHOT_SIZE/2.0, pos_y-SHOT_SIZE/2.0, 0.0);
             }
             glEnd();
             glDisable(GL_TEXTURE_2D);
@@ -175,6 +177,7 @@ class Player
         ~Player()
         {
             glDeleteTextures(1, &_V_texture_player);
+            glDeleteTextures(1, &_V_texture_shot);
         }
 };
 

@@ -20,8 +20,6 @@
 
 class meteor {
     private:
-        LL_AL5::Image _V_sprite_meteor;
-        GLuint _V_texture_meteor = 0;
         LL_MathStructure::Point<3> position;
         GLfloat direction;
         GLfloat size;
@@ -31,9 +29,6 @@ class meteor {
             size = SIZE_METEORS;
             direction = LL::sexagesimal_to_radian( LL::random( MIN_ANGLE, MAX_ANGLE, true) );
             speed = MIN_SPEED;
-            _V_sprite_meteor.set_path("meteor.png");
-            _V_sprite_meteor.load();
-            _V_texture_meteor = al_get_opengl_texture(_V_sprite_meteor);
         }
         meteor(GLfloat x, GLfloat y, GLfloat sizeM, GLfloat dir, GLfloat speedM){
             position[0] = x;
@@ -63,43 +58,29 @@ class meteor {
             position[1] +=(dt*speed*sin(direction));
         }
 
-        void drawCircle(GLdouble xPoint, GLdouble yPoint, GLdouble radio){
-            //glBegin(GL_POLYGON);
+        void draw(GLuint texture_id){
+            glPushMatrix();
                 glEnable(GL_TEXTURE_2D);
-                glBindTexture(GL_TEXTURE_2D, _V_texture_meteor); 
+                glBindTexture(GL_TEXTURE_2D, texture_id);
 
                 glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
                 glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_REPEAT);
                 glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_REPEAT);
-                /*for(GLint numPoints = 0; numPoints < 50; ++numPoints){
-                    angle = numPoints * dividedAngle ;
-                    glTexCoord2f( ( cos(angle) )/2.0 + 0.5, ( sin(angle)/2.0 + 0.5 ));
-                    glVertex3f( xPoint + ( radio * cos(angle) ), yPoint + ( radio * sin(angle) ), 0);
-                }*/
                 glBegin(GL_QUADS);
-                  GLdouble dividedAngle;
-                  dividedAngle = (2 * LL::MATH_PI) / 50;
-                  GLdouble angle;
-                  glTexCoord2f(1, 1);
-                  glVertex3f(xPoint-size,yPoint-size,0.0);
+                    glTexCoord2f(1, 1);
+                    glVertex3f(position[0]-size/2,position[1]-size/2,0.0);
 
-                  glTexCoord2f(0,1);
-                  glVertex3f(xPoint+size,yPoint-size,0.0);
+                    glTexCoord2f(0,1);
+                    glVertex3f(position[0]+size/2,position[1]-size/2,0.0);
 
-                  glTexCoord2f(0, 0);
-                  glVertex3f(xPoint+size,yPoint+size,0.0);
+                    glTexCoord2f(0, 0);
+                    glVertex3f(position[0]+size/2,position[1]+size/2,0.0);
 
-                  glTexCoord2f(1, 0);
-                  glVertex3f(xPoint-size,yPoint+size,0.0);
+                    glTexCoord2f(1, 0);
+                    glVertex3f(position[0]-size/2,position[1]+size/2,0.0);
                 glEnd();
                 glDisable(GL_TEXTURE_2D);
-            //glEnd();
-        }
-
-        void draw(){
-            glPushMatrix();
-                drawCircle(position[0],position[1], size);
             glPopMatrix();
         }
 
@@ -149,30 +130,17 @@ struct meteorsEngine {
         double timerForMeteors;
         unsigned int numberOfMaxMeteors;
         LL::Chronometer timer;
+        LL_AL5::Image _V_sprite_meteor;
+        GLuint _V_texture_meteor = 0;
     public:
         meteorsEngine(unsigned int numMaxMeteors = MAX_METEORS_EASY, double time_meteor = TIME_TO_CREATE){
             numberOfMaxMeteors = numMaxMeteors;
             timerForMeteors = time_meteor;
+            _V_sprite_meteor.set_path("meteor.png");
+            _V_sprite_meteor.load();
+            _V_texture_meteor = al_get_opengl_texture(_V_sprite_meteor);
             timer.play();
         }
-    /*
-        meteorsEngine(const meteorsEngine & engineMet){
-            for (int i = 0; i < engineMet.meteorsInTheSpace.size(); ++i) {
-                meteorsInTheSpace.push_back( engineMet.meteorsInTheSpace[i] );
-            }
-        }
-    */
-        /*void run(){
-            while( meteorsInTheSpace.size() > 0 ){
-                if (timer.get_time() >= timerForMeteors){
-                    makeMeteors( LL::random(MIN_METEORS, numberOfMaxMeteors, true) );
-                    timer.clear();
-                }
-                move();
-                checkingIfAlive();
-                std::cout<<meteorsInTheSpace.size()<<'\n'<<'\n';
-            }
-        }*/
         void setTimerForMeteors(double timer){
             timerForMeteors = timer;
         }
@@ -211,7 +179,7 @@ struct meteorsEngine {
         void draw()
         {
             for (std::list< meteor >::iterator it = meteorsInTheSpace.begin(); it != meteorsInTheSpace.end(); ++it)
-                (*it).draw();
+                (*it).draw(_V_texture_meteor);
         }
         template<typename T>
         int meteor_collision(T* player)
@@ -243,6 +211,7 @@ struct meteorsEngine {
 
         ~meteorsEngine(){
             meteorsInTheSpace.clear();
+            glDeleteTextures(1, &_V_texture_meteor);
         }
 };
 
