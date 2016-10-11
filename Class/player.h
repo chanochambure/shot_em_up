@@ -7,7 +7,9 @@ class Player
 {
     private:
         LL_AL5::Image _V_sprite_player;
+        LL_AL5::Image _V_sprite_shot;
         GLuint _V_texture_player=0;
+        GLuint _V_texture_shot=0;
         GLfloat _V_max_speed=300.0;
         GLfloat _V_pos_x=0.0;
         GLfloat _V_pos_y=0.0;
@@ -32,6 +34,9 @@ class Player
             _V_sprite_player.set_path("nave.png");
             _V_sprite_player.load();
             _V_texture_player = al_get_opengl_texture(_V_sprite_player);
+            _V_sprite_shot.set_path("fire.png");
+            _V_sprite_shot.load();
+            _V_texture_shot = al_get_opengl_texture(_V_sprite_shot);
         }
         void set_pos(GLfloat new_x,GLfloat new_y)
         {
@@ -91,7 +96,7 @@ class Player
         }
         void draw()
         {
-            glColor3d(128,128,128);
+            //glColor3d(128,128,128);
             glEnable(GL_TEXTURE_2D);
             glBindTexture(GL_TEXTURE_2D, _V_texture_player);
 
@@ -114,26 +119,29 @@ class Player
             glEnd();
             glDisable(GL_TEXTURE_2D);
 
-            glColor3d(255,0,0);
+            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, _V_texture_shot);
+
+            glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+            glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_REPEAT);
+            glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_REPEAT);
             glBegin(GL_QUADS);
             for(std::list<Weapon_Shot>::iterator iter=shots.begin();iter!=shots.end();++iter)
             {
                 float pos_x=((*iter).second).first[0]+((*iter).first*cos(((*iter).second).second));
                 float pos_y=((*iter).second).first[1]+((*iter).first*sin(((*iter).second).second));
-                glVertex3f(pos_x-SHOT_SIZE/2,
-                           pos_y-SHOT_SIZE/2,
-                           0.0);
-                glVertex3f(pos_x-SHOT_SIZE/2,
-                           pos_y+SHOT_SIZE/2,
-                           0.0);
-                glVertex3f(pos_x+SHOT_SIZE/2,
-                           pos_y+SHOT_SIZE/2,
-                           0.0);
-                glVertex3f(pos_x+SHOT_SIZE/2,
-                           pos_y-SHOT_SIZE/2,
-                           0.0);
+                glTexCoord2f(1, 1);
+                glVertex3f(pos_x-SHOT_SIZE/1.5, pos_y-SHOT_SIZE/1.5, 0.0);
+                glTexCoord2f(0, 1);
+                glVertex3f(pos_x-SHOT_SIZE/1.5, pos_y+SHOT_SIZE/1.5, 0.0);
+                glTexCoord2f(0, 0);
+                glVertex3f(pos_x+SHOT_SIZE/1.5, pos_y+SHOT_SIZE/1.5, 0.0);
+                glTexCoord2f(1, 0);
+                glVertex3f(pos_x+SHOT_SIZE/1.5, pos_y-SHOT_SIZE/1.5, 0.0);
             }
             glEnd();
+            glDisable(GL_TEXTURE_2D);
         }
         void clear()
         {

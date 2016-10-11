@@ -20,6 +20,8 @@
 
 class meteor {
     private:
+        LL_AL5::Image _V_sprite_meteor;
+        GLuint _V_texture_meteor = 0;
         LL_MathStructure::Point<3> position;
         GLfloat direction;
         GLfloat size;
@@ -29,6 +31,9 @@ class meteor {
             size = SIZE_METEORS;
             direction = LL::sexagesimal_to_radian( LL::random( MIN_ANGLE, MAX_ANGLE, true) );
             speed = MIN_SPEED;
+            _V_sprite_meteor.set_path("meteor.png");
+            _V_sprite_meteor.load();
+            _V_texture_meteor = al_get_opengl_texture(_V_sprite_meteor);
         }
         meteor(GLfloat x, GLfloat y, GLfloat sizeM, GLfloat dir, GLfloat speedM){
             position[0] = x;
@@ -59,16 +64,37 @@ class meteor {
         }
 
         void drawCircle(GLdouble xPoint, GLdouble yPoint, GLdouble radio){
-            glBegin(GL_POLYGON);
-                glColor3d(0,0,255); //Color RGB
-                GLdouble dividedAngle;
-                dividedAngle = (2 * LL::MATH_PI) / 50;
-                GLdouble angle;
-                for(GLint numPoints = 0; numPoints < 50; ++numPoints){
+            //glBegin(GL_POLYGON);
+                glEnable(GL_TEXTURE_2D);
+                glBindTexture(GL_TEXTURE_2D, _V_texture_meteor); 
+
+                glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+                glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_REPEAT);
+                glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_REPEAT);
+                /*for(GLint numPoints = 0; numPoints < 50; ++numPoints){
                     angle = numPoints * dividedAngle ;
+                    glTexCoord2f( ( cos(angle) )/2.0 + 0.5, ( sin(angle)/2.0 + 0.5 ));
                     glVertex3f( xPoint + ( radio * cos(angle) ), yPoint + ( radio * sin(angle) ), 0);
-                }
-            glEnd();
+                }*/
+                glBegin(GL_QUADS);
+                  GLdouble dividedAngle;
+                  dividedAngle = (2 * LL::MATH_PI) / 50;
+                  GLdouble angle;
+                  glTexCoord2f(1, 1);
+                  glVertex3f(xPoint-size,yPoint-size,0.0);
+
+                  glTexCoord2f(0,1);
+                  glVertex3f(xPoint+size,yPoint-size,0.0);
+
+                  glTexCoord2f(0, 0);
+                  glVertex3f(xPoint+size,yPoint+size,0.0);
+
+                  glTexCoord2f(1, 0);
+                  glVertex3f(xPoint-size,yPoint+size,0.0);
+                glEnd();
+                glDisable(GL_TEXTURE_2D);
+            //glEnd();
         }
 
         void draw(){
