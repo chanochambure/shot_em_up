@@ -1,7 +1,8 @@
 #include "gamemain.h"
 
-int main()
+int main(int argc,char* argv[])
 {
+    glutInit(&argc,argv);
     LL_AL5::init_allegro();
     LL_AL5::image_addon();
     LL_AL5::text_addon();
