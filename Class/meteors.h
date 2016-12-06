@@ -10,13 +10,13 @@
 #define MAX_SPEED_HARD      500
 #define MIN_SPEED           200
 // Engine
-#define MAX_METEORS_PEER_CREATE 15
-#define MIN_METEORS         5
-#define MAX_METEORS_EASY    50
-#define MAX_METEORS_NORMAL  100
-#define MAX_METEORS_HARD    150
-#define TIME_TO_CREATE      0.8
-#define SIZE_METEORS        50
+#define MAX_METEORS_PEER_CREATE 20
+#define MIN_METEORS         7
+#define MAX_METEORS_EASY    100
+#define MAX_METEORS_NORMAL  150
+#define MAX_METEORS_HARD    200
+#define TIME_TO_CREATE      0.6
+#define SIZE_METEORS        40
 
 class meteor {
     private:
@@ -35,7 +35,7 @@ class meteor {
         void move(float dt=1){
             position[0] +=(dt*speed*cos(direction));
             position[1] +=(dt*speed*sin(direction));
-            position[2] +=(dt*2.5*speed);
+            position[2] +=(dt*4*speed);
         }
 
         void draw(GLuint texture_id){
@@ -127,7 +127,6 @@ struct meteorsEngine {
                     ++iter;
             }
         }
-
         void move(float dt){
             if(timer.get_time()>=timerForMeteors and meteorsInTheSpace.size()<=numberOfMaxMeteors)
             {
@@ -171,7 +170,6 @@ struct meteorsEngine {
             timer.clear();
             meteorsInTheSpace.clear();
         }
-
         ~meteorsEngine(){
             meteorsInTheSpace.clear();
             glDeleteTextures(1, &_V_texture_meteor);

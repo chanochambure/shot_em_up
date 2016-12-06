@@ -17,15 +17,24 @@ class Player
         typedef std::pair<LL_MathStructure::Point<3>,float> Direction_Shot;
         typedef std::pair<float,Direction_Shot> Weapon_Shot;
         std::list<Weapon_Shot> shots;
+        float _V_bullet_size;
         float _V_time_to_shot;
         int _V_shot_speed=350.0;
-        int _V_shot_max_distance=900.0;
+        int _V_shot_max_distance=2000.0;
+        LL::Chronometer _V_timer_giants_shots;
+        bool _V_giants_shots=false;
+        LL::Chronometer _V_timer_fast_shot;
+        bool _V_fast_shot=false;
+        std::list<LL_AL5::Audio*> _V_list_to_destroy;
+        LL::Chronometer _V_timer_temp;
     public:
         Player()
         {
+            _V_timer_temp.play();
             _V_size=40;
             _V_timer.play();
             _V_time_to_shot=TIME_TO_SHOT;
+            _V_bullet_size=SHOT_SIZE;
         }
         void set_pos(GLfloat new_x,GLfloat new_y,GLfloat new_z)
         {
@@ -78,12 +87,34 @@ class Player
                 else
                     iter=shots.erase(iter);
             }
+            if(_V_giants_shots)
+            {
+                if(_V_timer_giants_shots.get_time()>=ENHANCER_GIANT_SHOT_DURATION)
+                {
+                    _V_giants_shots=false;
+                    _V_timer_giants_shots.stop();
+                }
+            }
+            if(_V_fast_shot)
+            {
+                if(_V_timer_fast_shot.get_time()>=ENHANCER_FAST_SHOT_DURATION)
+                {
+                    _V_fast_shot=false;
+                    _V_timer_fast_shot.stop();
+                }
+            }
             shot();
         }
         void shot()
         {
             if(_V_timer.get_time()>_V_time_to_shot)
             {
+                LL_AL5::Audio* _V_shot_sound=new LL_AL5::Audio();
+                _V_shot_sound->set_path("Laser.wav");
+                _V_shot_sound->load();
+                _V_shot_sound->set_volume(0.5);
+                _V_shot_sound->play();
+                _V_list_to_destroy.push_back(_V_shot_sound);
                 float angle=LL::sexagesimal_to_radian(-90);
                 shots.push_back(Weapon_Shot(0,Direction_Shot(LL_MathStructure::create_point(_V_position[0],
                                                                                             _V_position[1],
@@ -93,6 +124,25 @@ class Player
         }
         void draw()
         {
+            if(_V_timer_temp.get_time()>=2)
+            {
+                if(_V_list_to_destroy.size())
+                {
+                    auto iter=_V_list_to_destroy.begin();
+                    delete(*iter);
+                    _V_list_to_destroy.erase(iter);
+                }
+                _V_timer_temp.clear();
+                _V_timer_temp.play();
+            }
+            if(_V_giants_shots)
+                _V_bullet_size=GIANT_SHOT_SIZE;
+            else
+                _V_bullet_size=SHOT_SIZE;
+            if(_V_fast_shot)
+                _V_time_to_shot=TIME_TO_SHOT_INC;
+            else
+                _V_time_to_shot=TIME_TO_SHOT;
             GLfloat ambient[] = { 0.2, 0.0, 0.0, 1.0};
             GLfloat diffuse[] = { 0.6, 0.0, 0.0, 1.0 };
             GLfloat	specular[] = { 0.8, 0.0, 0.0, 1.0 };
@@ -106,7 +156,7 @@ class Player
                 float pos_z=((*iter).second).first[2]+((*iter).first*sin(((*iter).second).second));
                 glPushMatrix();
                     glTranslatef(pos_x,pos_y,pos_z);
-                    glutSolidSphere(SHOT_SIZE,4,4);
+                    glutSolidSphere(_V_bullet_size,4,4);
                 glPopMatrix();
             }
             glPushMatrix();
@@ -123,11 +173,51 @@ class Player
         }
         void clear()
         {
+            for(auto iter=_V_list_to_destroy.begin();iter!=_V_list_to_destroy.end();++iter)
+                delete(*iter);
+            _V_list_to_destroy.clear();
             _V_timer.clear();
             shots.clear();
+            _V_giants_shots=false;
+            _V_timer_giants_shots.stop();
+            _V_fast_shot=false;
+            _V_timer_fast_shot.stop();
         }
-
-        int meteor_collision(meteor meteoro)
+        void message()
+        {
+            if(_V_giants_shots)
+                std::cout<<"GIANT SHOTS!"<<std::endl;
+            if(_V_fast_shot)
+                std::cout<<"FAST SHOTS!"<<std::endl;
+        }
+        bool enhancer_collision(Enhancer* enhancer)
+        {
+            if(LL::segment_collision(enhancer->getPosX()-enhancer->get_size()*COLLISION_TOLERANCE/2,
+                                     enhancer->getPosX()+enhancer->get_size()*COLLISION_TOLERANCE/2,
+                                     _V_position[0]-_V_size/2,_V_position[0]+_V_size/2))
+            {
+                if(LL::segment_collision(enhancer->getPosY()-enhancer->get_size()*COLLISION_TOLERANCE/2,
+                                         enhancer->getPosY()+enhancer->get_size()*COLLISION_TOLERANCE/2,
+                                                 _V_position[1]-_V_size/2,_V_position[1]+_V_size/2))
+                {
+                    if(enhancer->get_type()==ENHANCER_GIANT_SHOT)
+                    {
+                        _V_timer_giants_shots.stop();
+                        _V_timer_giants_shots.play();
+                        _V_giants_shots=true;
+                    }
+                    if(enhancer->get_type()==ENHANCER_FAST_SHOT)
+                    {
+                        _V_timer_fast_shot.stop();
+                        _V_timer_fast_shot.play();
+                        _V_fast_shot=true;
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+        int meteor_collision(meteor& meteoro)
         {
             for(std::list<Weapon_Shot>::iterator iter=shots.begin();iter!=shots.end();++iter)
             {
@@ -135,15 +225,15 @@ class Player
                 float pos_y=((*iter).second).first[1];
                 float pos_z=((*iter).second).first[2]+((*iter).first*sin(((*iter).second).second));
                 if(LL::segment_collision(meteoro.getPosX()-meteoro.get_size()/2,meteoro.getPosX()+meteoro.get_size()/2,
-                                         pos_x-SHOT_SIZE/2,pos_x+SHOT_SIZE/2))
+                                         pos_x-_V_bullet_size/2,pos_x+_V_bullet_size/2))
                 {
                     if(LL::segment_collision(meteoro.getPosY()-meteoro.get_size()*COLLISION_TOLERANCE/2,
                                              meteoro.getPosY()+meteoro.get_size()*COLLISION_TOLERANCE/2,
-                                             pos_y-SHOT_SIZE/2,pos_y+SHOT_SIZE/2))
+                                             pos_y-_V_bullet_size/2,pos_y+_V_bullet_size/2))
                     {
                         if(LL::segment_collision(meteoro.getPosZ()-meteoro.get_size()*COLLISION_TOLERANCE/2,
                                              meteoro.getPosZ()+meteoro.get_size()*COLLISION_TOLERANCE/2,
-                                             pos_z-SHOT_SIZE/2,pos_z+SHOT_SIZE/2))
+                                             pos_z-_V_bullet_size/2,pos_z+_V_bullet_size/2))
                             return 1;
                     }
                 }
@@ -166,6 +256,7 @@ class Player
         }
         ~Player()
         {
+            clear();
         }
 };
 
