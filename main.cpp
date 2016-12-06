@@ -8,7 +8,7 @@ int main(int argc,char* argv[])
     LL_AL5::text_addon();
     LL_AL5::audio_addon();
     LL_AL5::Display display(SIZE_X,SIZE_Y);
-    display.set_flag(ALLEGRO_OPENGL | ALLEGRO_FULLSCREEN_WINDOW);
+    display.set_flag(ALLEGRO_OPENGL);
 
     LL_AL5::Timer timer;
     timer.set_speed_seconds(1.0/30);
