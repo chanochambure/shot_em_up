@@ -38,16 +38,19 @@ class meteor {
             position[2] +=(dt*4*speed);
         }
 
-        void draw(GLuint texture_id){
-            GLfloat ambient[] = { 0.3, 0.3, 0.0, 1.0};
-            GLfloat diffuse[] = { 0.6, 0.6, 0.0, 1.0 };
-            GLfloat	specular[] = { 0.9, 0.9, 0.0, 1.0 };
+        void draw(GLuint texture_id,GLUquadric* qobj){
+            GLfloat ambient[] = { 0.5, 0.3, 0.0, 1.0};
+            GLfloat diffuse[] = { 0.8, 0.6, 0.0, 1.0 };
+            GLfloat	specular[] = { 1.0, 0.9, 0.0, 1.0 };
             glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
             glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
             glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
             glPushMatrix();
                 glTranslatef(position[0],position[1],position[2]);
-                glutSolidSphere(size,8,8);
+                glEnable(GL_TEXTURE_2D);
+                glBindTexture(GL_TEXTURE_2D,texture_id);
+                gluSphere(qobj,size,8,8);
+                glDisable(GL_TEXTURE_2D);
             glPopMatrix();
         }
 
@@ -92,6 +95,7 @@ struct meteorsEngine {
         LL::Chronometer timer;
         LL_AL5::Image _V_sprite_meteor;
         GLuint _V_texture_meteor = 0;
+        GLUquadric *_V_qobj;
     public:
         meteorsEngine(unsigned int numMaxMeteors = MAX_METEORS_EASY, double time_meteor = TIME_TO_CREATE)
         {
@@ -101,6 +105,8 @@ struct meteorsEngine {
             _V_sprite_meteor.load();
             _V_texture_meteor = al_get_opengl_texture(_V_sprite_meteor);
             timer.play();
+            _V_qobj = gluNewQuadric();
+            gluQuadricTexture(_V_qobj,GL_TRUE);
         }
         void setTimerForMeteors(double timer)
         {
@@ -141,7 +147,7 @@ struct meteorsEngine {
         void draw()
         {
             for (std::list< meteor >::iterator it = meteorsInTheSpace.begin(); it != meteorsInTheSpace.end(); ++it)
-                (*it).draw(_V_texture_meteor);
+                (*it).draw(_V_texture_meteor,_V_qobj);
         }
         template<typename T>
         int meteor_collision(T* player)
@@ -171,6 +177,7 @@ struct meteorsEngine {
             meteorsInTheSpace.clear();
         }
         ~meteorsEngine(){
+            gluDeleteQuadric(_V_qobj);
             meteorsInTheSpace.clear();
             glDeleteTextures(1, &_V_texture_meteor);
         }

@@ -27,6 +27,9 @@ class Player
         bool _V_fast_shot=false;
         std::list<LL_AL5::Audio*> _V_list_to_destroy;
         LL::Chronometer _V_timer_temp;
+        LL_AL5::Image _V_sprite_shot;
+        GLuint _V_texture_shot = 0;
+        GLUquadric *_V_qobj_shot;
     public:
         Player()
         {
@@ -35,6 +38,11 @@ class Player
             _V_timer.play();
             _V_time_to_shot=TIME_TO_SHOT;
             _V_bullet_size=SHOT_SIZE;
+            _V_sprite_shot.set_path("disparo.png");
+            _V_sprite_shot.load();
+            _V_texture_shot= al_get_opengl_texture(_V_sprite_shot);
+            _V_qobj_shot = gluNewQuadric();
+            gluQuadricTexture(_V_qobj_shot,GL_TRUE);
         }
         void set_pos(GLfloat new_x,GLfloat new_y,GLfloat new_z)
         {
@@ -143,9 +151,9 @@ class Player
                 _V_time_to_shot=TIME_TO_SHOT_INC;
             else
                 _V_time_to_shot=TIME_TO_SHOT;
-            GLfloat ambient[] = { 0.2, 0.0, 0.0, 1.0};
-            GLfloat diffuse[] = { 0.6, 0.0, 0.0, 1.0 };
-            GLfloat	specular[] = { 0.8, 0.0, 0.0, 1.0 };
+            GLfloat ambient[] = { 0.4, 0.4, 0.4, 1.0};
+            GLfloat diffuse[] = { 0.8, 0.8, 0.8, 1.0 };
+            GLfloat	specular[] = { 1.0, 1.0, 1.0, 1.0 };
             glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient);
             glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
             glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
@@ -156,13 +164,16 @@ class Player
                 float pos_z=((*iter).second).first[2]+((*iter).first*sin(((*iter).second).second));
                 glPushMatrix();
                     glTranslatef(pos_x,pos_y,pos_z);
-                    glutSolidSphere(_V_bullet_size,4,4);
+                    glEnable(GL_TEXTURE_2D);
+                    glBindTexture(GL_TEXTURE_2D,_V_texture_shot);
+                    gluSphere(_V_qobj_shot,_V_bullet_size,8,8);
+                    glDisable(GL_TEXTURE_2D);
                 glPopMatrix();
             }
             glPushMatrix();
-                GLfloat nave_ambient[] = { 0.0, 0.0, 0.4, 1.0};
-                GLfloat nave_diffuse[] = { 0.0, 0.0, 0.6, 1.0 };
-                GLfloat	nave_specular[] = { 0.0, 0.0, 0.8, 1.0 };
+                GLfloat nave_ambient[] = { 0.0, 0.2, 0.2, 1.0};
+                GLfloat nave_diffuse[] = { 0.0, 0.4, 0.4, 1.0 };
+                GLfloat	nave_specular[] = { 0.0, 0.6, 0.6, 1.0 };
                 glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, nave_ambient);
                 glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, nave_diffuse);
                 glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, nave_specular);

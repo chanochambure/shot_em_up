@@ -39,16 +39,16 @@
 #define PAUSE               "P"
 #define GRID                "G"
 
-#define TIME_TO_SHOT        0.7
+#define TIME_TO_SHOT        0.6
 #define TIME_TO_SHOT_INC    0.1
 #define SHOT_SIZE           10
-#define GIANT_SHOT_SIZE     30
+#define GIANT_SHOT_SIZE     40
 
-#define ENHANCER_GIANT_SHOT_DURATION        3
-#define ENHANCER_FAST_SHOT_DURATION        8
+#define ENHANCER_GIANT_SHOT_DURATION        4
+#define ENHANCER_FAST_SHOT_DURATION        7
 
 #define COLLISION_TOLERANCE 0.8
-#define COLLISION_TOLERANCE_Z 0.4
+#define COLLISION_TOLERANCE_Z 0.3
 
 #include "Class/Enhancer.h"
 #include "Class/meteors.h"

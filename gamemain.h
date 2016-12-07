@@ -13,7 +13,7 @@ void openGL_configuration()
 //    glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-    GLfloat position[] = { 0,0,0, 1.0f };
+    GLfloat position[] = { 0,SIZE_Z/2,0, 1.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
 
     glShadeModel(GL_SMOOTH);
@@ -51,15 +51,19 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
     Player player;
     player.set_pos(INITIAL_X,INITIAL_Y,INITIAL_Z);
     meteorsEngine engine;
+    Block block(SIZE_X,SIZE_Y,SIZE_Z);
+    bool draw_grid=false;
+    bool pause=false;
+    EnhancerEngine enhancer;
     LL_AL5::Audio stage;
     stage.set_path("stage.ogg");
     stage.load();
     stage.set_playmode(ALLEGRO_PLAYMODE_LOOP);
     stage.play();
-    Block block(SIZE_X,SIZE_Y,SIZE_Z);
-    bool draw_grid=true;
-    bool pause=false;
-    EnhancerEngine enhancer;
+    LL_AL5::Audio end_game;
+    end_game.set_path("end.ogg");
+    end_game.load();
+    end_game.set_playmode(ALLEGRO_PLAYMODE_LOOP);
     while(!input->get_display_status())
     {
         if(input->get_event())
@@ -86,6 +90,12 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
             int to_upgrade=engine.meteor_collision(&player);
             if(to_upgrade==-1)
             {
+                stage.stop();
+                end_game.play();
+                std::cout<<"Perdiste :v"<<std::endl;
+                LL_AL5::sleep(3.0);
+                input->clear_events();
+                input->clear_key_status();
                 player.clear();
                 player.set_pos(INITIAL_X,INITIAL_Y,INITIAL_Z);
                 engine.clear();
@@ -93,6 +103,8 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
                 if(max_score<score)
                     max_score=score;
                 score=0;
+                end_game.stop();
+                stage.play();
             }
             else
                 score+=to_upgrade;

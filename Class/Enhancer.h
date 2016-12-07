@@ -6,7 +6,7 @@
 #define ENHANCER_DURATION_IN_DISPLAY 2
 
 #define TIMER_ENHANCER_ENGINE 6
-#define ENHANCER_SIZE 30
+#define ENHANCER_SIZE 40
 
 class Enhancer
 {
@@ -34,7 +34,7 @@ class Enhancer
         {
             if(type==ENHANCER_GIANT_SHOT)
             {
-                _V_sprite.set_path("giant_bullet.png");
+                _V_sprite.set_path("giant_shot.png");
                 _V_sprite.load();
                 _V_texture = al_get_opengl_texture(_V_sprite);
             }
@@ -54,8 +54,8 @@ class Enhancer
         {
             activated=true;
             timer.play();
-            _V_position[0] = LL::random(-SIZE_X/2, SIZE_X/2, true);
-            _V_position[1] = LL::random(-SIZE_Y/2, SIZE_Y/2, true);
+            _V_position[0] = LL::random(-SIZE_X/2+_V_size, SIZE_X/2-_V_size, true);
+            _V_position[1] = LL::random(-SIZE_Y/2+_V_size, SIZE_Y/2-_V_size, true);
         }
         float get_size()
         {
@@ -125,7 +125,7 @@ class EnhancerEngine
         {
             if(timer.get_time()>=TIMER_ENHANCER_ENGINE)
             {
-                int choose=LL::random(1,5);
+                int choose=LL::random(1,4);
                 if(choose==ENHANCER_GIANT_SHOT)
                     _V_giant_bullets.activate();
                 else if(choose==ENHANCER_FAST_SHOT)
