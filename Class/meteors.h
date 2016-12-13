@@ -134,7 +134,7 @@ struct meteorsEngine {
             }
         }
         void move(float dt){
-            if(timer.get_time()>=timerForMeteors and meteorsInTheSpace.size()<=numberOfMaxMeteors)
+            if(timer.get_time()>=timerForMeteors or meteorsInTheSpace.size()<=MIN_METEORS)
             {
                 makeMeteors( LL::random(MIN_METEORS, MAX_METEORS_PEER_CREATE, true) );
                 timer.clear();
