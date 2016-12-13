@@ -13,6 +13,7 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 
+#define CONST_WINDOWS		3.6
 #define SIZE_X              800.0
 #define SIZE_Y              600.0
 #define SIZE_Z              1800.0
@@ -54,5 +55,7 @@
 #include "Class/meteors.h"
 #include "Class/player.h"
 #include "Class/Block.h"
+#include "Class/background.h"
+
 
 #endif //INCLUDED_MAIN_HEADERS_H

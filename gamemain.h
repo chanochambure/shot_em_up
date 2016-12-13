@@ -48,6 +48,7 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
     LL::Chronometer timer;
     timer.play();
     openGL_configuration();
+    background space;
     Player player;
     player.set_pos(INITIAL_X,INITIAL_Y,INITIAL_Z);
     meteorsEngine engine;
@@ -130,6 +131,7 @@ void start_game(LL_AL5::Display* display,LL_AL5::Input* input)
                         block.draw();
                     glEnable(GL_LIGHTING);
                 }
+                space.draw();
                 engine.draw();
                 player.draw();
                 enhancer.draw();
