@@ -28,9 +28,19 @@ class Player
         std::list<LL_AL5::Audio*> _V_list_to_destroy;
         LL::Chronometer _V_timer_temp;
         LL_AL5::Image _V_sprite_shot;
+        LL_AL5::Image _V_sprite_ship;
         GLuint _V_texture_shot = 0;
+        GLint _V_texture_ship = 0;
         GLUquadric *_V_qobj_shot;
     public:
+
+        void printTex(){
+            std::cout<<"textura: "<<_V_sprite_shot <<'\n';
+            std::cout<<"textura: "<<_V_texture_shot <<'\n';
+            std::cout<<"textura: "<<_V_sprite_ship <<'\n';            
+            std::cout<<"textura: "<<_V_texture_ship <<'\n';            
+        }
+
         Player()
         {
             _V_timer_temp.play();
@@ -38,9 +48,17 @@ class Player
             _V_timer.play();
             _V_time_to_shot=TIME_TO_SHOT;
             _V_bullet_size=SHOT_SIZE;
+
+            _V_sprite_ship.set_path("ship.png");
+            _V_sprite_ship.load();
+            _V_texture_ship = al_get_opengl_texture(_V_sprite_ship);
+
             _V_sprite_shot.set_path("disparo.png");
             _V_sprite_shot.load();
             _V_texture_shot= al_get_opengl_texture(_V_sprite_shot);
+
+
+
             _V_qobj_shot = gluNewQuadric();
             gluQuadricTexture(_V_qobj_shot,GL_TRUE);
         }
@@ -178,9 +196,30 @@ class Player
                 glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, nave_diffuse);
                 glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, nave_specular);
 
-                glTranslatef(_V_position[0],_V_position[1],_V_position[2]);
-                glutSolidSphere(_V_size,6,6);
+
+            glDisable(GL_LIGHTING);
+            glEnable(GL_TEXTURE_2D);
+//                glTranslatef(_V_position[0],_V_position[1],_V_position[2]);
+//               glutSolidSphere(_V_size,6,6);
+
+                glBindTexture(GL_TEXTURE_2D,_V_texture_ship);
+                glBegin(GL_QUADS);
+
+                    glTexCoord2f(0.0f,0.0f);
+                    glVertex3f(_V_position[0] + (2.0*_V_size/2.0),_V_position[1] + (1.5*_V_size/2.0),_V_position[2]);
+                    glTexCoord2f(0.0f,1.0f);
+                    glVertex3f(_V_position[0] + (2.0*_V_size/2.0),_V_position[1] - (1.5*_V_size/2.0),_V_position[2]);
+                    glTexCoord2f(1.0f,1.0f);
+                    glVertex3f(_V_position[0] - (2.0*_V_size/2.0),_V_position[1] - (1.5*_V_size/2.0),_V_position[2]);
+                    glTexCoord2f(1.0f,0.0f);
+                    glVertex3f(_V_position[0] - (2.0*_V_size/2.0),_V_position[1] + (1.5*_V_size/2.0),_V_position[2]);
+
+                glEnd();
+
+
+                glDisable(GL_TEXTURE_2D);
             glPopMatrix();
+            glEnable(GL_LIGHTING);
         }
         void clear()
         {
